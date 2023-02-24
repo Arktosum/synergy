@@ -78,9 +78,10 @@ io.on('connection',(socket)=>{
         people[user_id] = socket.id
     })
     socket.on('sendMessage',(message)=>{
-        let sendSocket = people[message.to]
-        if (sendSocket){
+        if (message.to in people){
+            let sendSocket = people[message.to]
             socket.to(sendSocket).emit('receiveMessage',message)
         }
     })
+
 })
