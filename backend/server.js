@@ -19,8 +19,12 @@ function addCRUD(apiEndpoint,schema){
         const item = new schema(req.body)
         try{
             await item.save()
-            res.send({success:true})
-        }catch(err) {console.log(err)}
+            res.send(true)
+        }  
+        catch(err){
+            console.log(err)
+            res.send(false)
+        }
     })
   
     app.post(`/api/${apiEndpoint}/read`,async (req,res)=>{
@@ -36,30 +40,29 @@ function addCRUD(apiEndpoint,schema){
 
         try{
             await schema.findOneAndUpdate(id,req.body)
-            res.send({sucess:true})
+            res.send(true)
         }
         catch(err){
             console.log(err);
+            res.send(false)
         }
     })
     app.post(`/api/${apiEndpoint}/delete`,async (req,res)=>{
         try{
             await schema.findOneAndDelete(req.body)
-            res.send({sucess:true})
+            res.send(true)
         }
         catch(err){
             console.log(err);
+            res.send(false)
         }
     })
 }
 const User = require('./models/User')
-
 addCRUD('users', User)
-
 app.get("/",(req,res)=>{
     res.send("<h1> Welcome to the backend!</h1>"); 
 })
-
 
 const server = app.listen(PORT,()=>{
     console.log(`Started listening on | http://localhost:${PORT}`);
@@ -72,16 +75,12 @@ const io = require('socket.io')(server,{
     }
 })
 
-let people = {}
+
 io.on('connection',(socket)=>{
-    socket.on('add-user',(user_id)=>{
-        people[user_id] = socket.id
+    socket.on('join-room',(room)=>{
+        socket.join(room) // Joins their own room!
     })
     socket.on('sendMessage',(message)=>{
-        if (message.to in people){
-            let sendSocket = people[message.to]
-            socket.to(sendSocket).emit('receiveMessage',message)
-        }
+        socket.in(message.to).emit('receiveMessage',message)
     })
-
 })
