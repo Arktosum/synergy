@@ -16,7 +16,7 @@ export default function Main() {
   let [selectedUser,setselectedUser] = useState(null);
   let [messages,setMessages] = useState([]);
   console.log("Page rendered")
-  const socket = io("http://localhost:3000");
+  const socket = io("https://Synergy.blazingknightog.repl.co");
   function rerender() {
     setTimeout(() => {
       render((prev) => !prev);
