@@ -155,12 +155,14 @@ function ChatBox(props) {
     }
     socket.emit('sendMessage',obj)
     setMessages(prev=>[...prev,obj])
+    let messageBox = document.getElementById('messageBox')
+    messageBox.scrollTop = messageBox.scrollHeight;
     e.target.reset();
   }
   return (
     <div className="">
       <div className="text-2xl">Message {selectedUser.username}</div>
-      <div className="bg-slate-600 p-5 h-[50vh] w-[50vw] overflow-y-scroll flex flex-col gap-5">
+      <div id="messageBox" className="bg-slate-600 p-5 h-[50vh] w-[50vw] overflow-y-scroll flex flex-col gap-5">
         {messageItems}
       </div>
       <form onSubmit={sendMessage} className="flex bg-gray-700 p-5 gap-5">
@@ -187,6 +189,8 @@ function Navbar(props){
   </div>
   </>)
 }
+
+// objDiv.scrollTop = objDiv.scrollHeight;
 // User:
 // {
 //   _id : _id
