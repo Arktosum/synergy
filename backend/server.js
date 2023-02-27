@@ -1,86 +1,47 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const mongoose = require('mongoose');
-const cors = require('cors');
-const PORT = 3000
-
+const mongoose = require("mongoose");
+const cors = require("cors");
+const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-let mongodbURI = `mongodb+srv://siddhujaykay2:shiine1984@synergy.en8nmpm.mongodb.net/main?retryWrites=true&w=majority`
+// let mongodbURI = `mongodb+srv://siddhujaykay2:shiine1984@synergy.en8nmpm.mongodb.net/main?retryWrites=true&w=majority`;
+let mongodbURI = `mongodb://localhost:27017/main`;
 
-mongoose.connect(mongodbURI,{
-    useNewUrlParser: true
-})
+const userRoute = require("./routes/users");
+const messageRoute = require("./routes/messages");
+const groupRoute = require("./routes/groups");
+app.use("/api/users", userRoute);
+app.use("/api/groups", groupRoute);
+app.use("/api/messages", messageRoute);
 
-function addCRUD(apiEndpoint,schema){
-    app.post(`/api/${apiEndpoint}/add`,async (req,res)=>{
-        console.log('Adding data!')
-        const item = new schema(req.body)
-        try{
-            await item.save()
-            res.send(true)
-        }  
-        catch(err){
-            console.log(err)
-            res.send(false)
-        }
-    })
-  
-    app.post(`/api/${apiEndpoint}/read`,async (req,res)=>{
-        schema.find(req.body,(err,result)=>{
-            if(err) res.send(err)
-            res.send(result)
-        })
-    })
-    
-    app.post(`/api/${apiEndpoint}/update`,async (req,res)=>{
-        let id = req.body.id
-        delete req.body.id
+mongoose.connect(mongodbURI, {
+  useNewUrlParser: true,
+});
 
-        try{
-            await schema.findOneAndUpdate(id,req.body)
-            res.send(true)
-        }
-        catch(err){
-            console.log(err);
-            res.send(false)
-        }
-    })
-    app.post(`/api/${apiEndpoint}/delete`,async (req,res)=>{
-        try{
-            await schema.findOneAndDelete(req.body)
-            res.send(true)
-        }
-        catch(err){
-            console.log(err);
-            res.send(false)
-        }
-    })
-}
-const User = require('./models/User')
-addCRUD('users', User)
-app.get("/",(req,res)=>{
-    res.send("<h1> Welcome to the backend!</h1>"); 
-})
+app.get("/", (req, res) => {
+  res.send("<h1>Welcome to backend</h1>");
+});
 
-const server = app.listen(PORT,()=>{
-    console.log(`Started listening on | http://localhost:${PORT}`);
-})
+const server = app.listen(PORT, () => {
+  console.log(`Started listening on | http://localhost:${PORT}`);
+});
 
-const io = require('socket.io')(server,{
-    cors:{
-        pingTimeOut:60000,
-        origin: '*'
-    }
-})
+const io = require("socket.io")(server, {
+  cors: {
+    pingTimeOut: 60000,
+    origin: "*",
+  },
+});
 
-
-io.on('connection',(socket)=>{
-    socket.on('join-room',(room)=>{
-        socket.join(room) // Joins their own room!
-    })
-    socket.on('sendMessage',(message)=>{
-        socket.in(message.to).emit('receiveMessage',message)
-    })
-})
+io.on("connection", (socket) => {
+  socket.on("send-message", (message) => {
+    console.log(message);
+    socket.to(message.to).emit("receive-message", message);
+  });
+  socket.on("join-room", (room) => {
+    console.log(`Joined Room | ${room}`);
+    socket.join(room);
+  });
+});
