@@ -1,11 +1,11 @@
 import React, { useEffect, useRef,useState } from 'react'
 import './App.css';
 import {styles} from './styles'
-import { POST } from './Utils';
+import { ORIGIN, POST } from './Utils';
 import {Link,useNavigate} from 'react-router-dom'
 import {io} from 'socket.io-client'
 
-const socket = io('http://localhost:3000')
+const socket = io(ORIGIN)
 export default function Main() {
     let user_id = localStorage.getItem('user-data');
     let navigate = useNavigate();
