@@ -37,11 +37,11 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   socket.on("send-message", (message) => {
-    console.log(message);
-    socket.to(message.to).emit("receive-message", message);
+    console.log(message.to._id);
+    socket.to(message.to._id).emit("receive-message", message);
   });
   socket.on("join-room", (room) => {
-    console.log(`Joined Room | ${room}`);
-    socket.join(room);
+    console.log(`Joined Room | ${room._id}`);
+    socket.join(room._id);
   });
 });

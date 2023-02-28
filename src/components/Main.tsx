@@ -3,13 +3,16 @@ import './App.css';
 import {styles} from './styles'
 import { POST } from './Utils';
 import {Link,useNavigate} from 'react-router-dom'
+import {io} from 'socket.io-client'
 
+const socket = io('http://localhost:3000')
 export default function Main() {
     let user_id = localStorage.getItem('user-data');
     let navigate = useNavigate();
     if(user_id == null) {
         navigate('/')
     }
+
     let [currentUser,setCurrentUser] = useState(null);
     let [renderState,setRender] = useState(false);
     let [fetchedUsers,setFetchedUsers] = useState([]);
@@ -17,6 +20,17 @@ export default function Main() {
     let [messages,setMessages] = useState([]);
     let [chatRooms,setChatRooms] = useState([]);
     let searchInput = useRef();
+    let messageBox = useRef();
+    useEffect(()=>{
+        socket.on('connect',()=>{
+         console.log("Connection established!"); 
+         socket.on('receive-message',(message)=>{
+            setMessages(prev=>[...prev,message])
+            setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
+         })  
+        }) 
+     },[])
+
     function forceRender(){
         setTimeout(()=>{
             setRender(prev=>!prev);
@@ -62,12 +76,14 @@ export default function Main() {
                 alert("No chat found! Creating an new one!");
                 POST('/api/groups/create',{users : [user_id,other_id]},(chat)=>{
                     setSelectedChat(chat);
+                    socket.emit('join-room',chat);
                 })
             }
             else{
                 alert("chat found!");
                 let chat = chats[0];
                 setSelectedChat(chat);
+                socket.emit('join-room',chat);
             }
         })
     }
@@ -82,7 +98,10 @@ export default function Main() {
         }
         POST('/api/messages/create', messageObj,(message)=>{
             setMessages(prev=>[...prev, message])
+            socket.emit('send-message',message);
+            setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
         })
+        
         e.target.reset()
     }
   if(currentUser == null) return;
@@ -104,6 +123,7 @@ export default function Main() {
                     return (<div key={user._id} onClick={()=>{
                         alert("Selected user " + user.username);
                         selectChat(user._id);
+                        
                     }} className='flex items-center gap-5 bg-slate-500 rounded-xl p-2 hover:scale-105 duration-200 cursor-pointer'>
                         <img src={user.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
                         <div className='text-2xl text-white font-bold'>{user.username}</div>
@@ -115,7 +135,9 @@ export default function Main() {
                 let [a,b] = chatRoom.users
                 let otherUser = a._id == currentUser._id ? b :a
                 return (<div onClick={()=>{
-                    setSelectedChat(chatRoom)}}
+                    setSelectedChat(chatRoom);
+                    socket.emit('join-room',chatRoom);
+                }}
                     key={chatRoom._id} className="bg-slate-500 p-5 rounded-xl flex items-center gap-5 hover:bg-slate-800 duration-200 cursor-pointer hover:scale-105">
                      <img src={otherUser.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
                     <div className='text-white text-2xl'>{otherUser.username}</div>
@@ -124,7 +146,7 @@ export default function Main() {
         </div>
         <div className='bg-slate-900 p-5'>
             <div className='text-xl text-white font-bold'>Chat</div>
-            <div className='bg-slate-600 h-[50vh] overflow-y-scroll p-5 flex flex-col gap-5'>{ 
+            <div ref={messageBox} className='bg-slate-600 h-[50vh] overflow-y-scroll p-5 flex flex-col gap-5'>{ 
                 messages.map((message)=>{
                     let fromSelf = message.from._id == user_id
                     return (<Message key={message._id} props={{message,fromSelf}}/>)
@@ -147,7 +169,6 @@ export default function Main() {
 
 function Message(props){
     let {message,fromSelf} = props.props
-    console.log(message,fromSelf)
     return(<div className={`flex ${fromSelf ? 'flex-row-reverse bg-purple-600' : 'bg-blue-600' } items-center gap-5 rounded-xl p-5`}>
         <div>
         <img src={message.from.avatarUrl} alt="" className='w-10 h-10 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
