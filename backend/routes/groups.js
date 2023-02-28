@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/create", async(req, res) => {
     try{
         const group = new Group(req.body)
+        await group.populate('users');
         await group.save();
         res.send(group);
     }

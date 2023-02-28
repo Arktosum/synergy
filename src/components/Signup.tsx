@@ -6,6 +6,10 @@ import {Link,useNavigate} from 'react-router-dom'
 
 export default function Signup() {
     let navigate = useNavigate()
+    let user_id = localStorage.getItem('user-data');
+    if(user_id != null) {
+        navigate('/chat')
+    }
     function createUser(e:React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         let {username,password,retypePassword,email} = Object.fromEntries(new FormData(e.target));

@@ -16,7 +16,7 @@ router.post("/create", async (req, res) => {
 });
 router.post("/read", async (req, res) => {
   try {
-    const user = await User.find(req.body).populate("connections");
+    const user = await User.find(req.body)
     res.send(user);
   } catch (e) {
     console.log(e.message);

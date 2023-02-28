@@ -7,6 +7,7 @@ const router = express.Router();
 router.post("/create", async(req, res) => {
     try{
         const message = new Message(req.body)
+        await message.populate('from to');
         await message.save();
         res.send(message);
     }
