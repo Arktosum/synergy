@@ -3,7 +3,9 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const PORT = 3000;
-app.use(cors());
+app.use(cors({
+  origin : "*"
+}));
 app.use(express.json());
 
 let mongodbURI = `mongodb+srv://siddhujaykay2:shiine1984@synergy.en8nmpm.mongodb.net/main?retryWrites=true&w=majority`;

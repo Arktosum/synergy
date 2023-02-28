@@ -5,7 +5,7 @@ import { ORIGIN, POST } from './Utils';
 import {Link,useNavigate} from 'react-router-dom'
 import {io} from 'socket.io-client'
 
-const socket = io(ORIGIN)
+const socket = io('https://Synergy.blazingknightog.repl.co')
 export default function Main() {
     let user_id = localStorage.getItem('user-data');
     let navigate = useNavigate();
@@ -25,6 +25,7 @@ export default function Main() {
         socket.on('connect',()=>{
          console.log("Connection established!"); 
          socket.on('receive-message',(message)=>{
+            console.log("received")
             setMessages(prev=>[...prev,message])
             setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
          })  
