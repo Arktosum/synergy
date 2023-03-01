@@ -180,26 +180,3 @@ function Message(props){
         <div className='text-white text-xl'>{message.content}</div>
     </div>)
 }
-/*
-START
-user has to [SIGNUP]. -> Create a new <User>    - DONE
-if user already signed up, [LOGIN] -> Check if <User> exists, and send them <User>.  - DONE
-
-Fetch all <Chat> where user is in. - DONE
-
-Single chat
-Find a <User> (can use regex to find multiple people and click on the one we want) - DONE
-then check if a chat <Chat> with them exists. if not , make a new <Chat> - DONE
-
-User SELECTS or "CLICKS" a <Chat> Which gives an chat_id. - DONE
-once Selected, fetch ALL messages with that chat_id - DONE
-
-
-SOCKET-IO - Emit join-room and join with chat_id
-
-
-Outgoing messages are sent from user and to the chat_id - DONE
-Incoming messages are sent from other user and to the chat_id - DONE
-
-END
-*/
