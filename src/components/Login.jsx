@@ -7,9 +7,12 @@ import {Link,useNavigate} from 'react-router-dom'
 export default function Login() {
     let navigate = useNavigate();
     let user_id = localStorage.getItem('user-data');
-    if(user_id != null) {
-        navigate('/chat')
-    }
+    setTimeout(()=>{
+        if(user_id != null) {
+            navigate('/chat')
+        }
+    },100)
+    
     function authenticateUser(e) {
         e.preventDefault();
         let {username,password} = Object.fromEntries(new FormData(e.target));

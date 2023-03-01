@@ -7,10 +7,12 @@ import {Link,useNavigate} from 'react-router-dom'
 export default function Signup() {
     let navigate = useNavigate()
     let user_id = localStorage.getItem('user-data');
-    if(user_id != null) {
-        navigate('/chat')
-    }
-    function createUser(e:React.FormEvent<HTMLFormElement>) {
+    setTimeout(()=>{
+        if(user_id != null) {
+            navigate('/chat')
+        }
+    },100)
+    function createUser(e) {
         e.preventDefault();
         let {username,password,retypePassword,email} = Object.fromEntries(new FormData(e.target));
         e.target.reset()
@@ -24,8 +26,8 @@ export default function Signup() {
             email : email,
             avatarUrl : `https://robohash.org/${username}`
         }
-        POST('/api/users/exists',{username:username},(data)=>{
-            if(data.length > 0){
+        POST('/api/users/exists',{username:username},(success)=>{
+            if(success){
                 alert("Someone with that username already exists!");
                 return;
             }

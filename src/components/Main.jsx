@@ -2,17 +2,16 @@ import React, { useEffect, useRef,useState } from 'react'
 import './App.css';
 import {styles} from './styles'
 import { ORIGIN, POST } from './Utils';
-import {Link,useNavigate} from 'react-router-dom'
+import {useNavigate} from 'react-router-dom'
 import {io} from 'socket.io-client'
 
-const socket = io('https://Synergy.blazingknightog.repl.co')
+const socket = io(ORIGIN)
 export default function Main() {
     let user_id = localStorage.getItem('user-data');
     let navigate = useNavigate();
     if(user_id == null) {
         navigate('/')
     }
-
     let [currentUser,setCurrentUser] = useState(null);
     let [renderState,setRender] = useState(false);
     let [fetchedUsers,setFetchedUsers] = useState([]);
@@ -23,13 +22,13 @@ export default function Main() {
     let messageBox = useRef();
     useEffect(()=>{
         socket.on('connect',()=>{
-         console.log("Connection established!"); 
+         console.log("Connection established!");
          socket.on('receive-message',(message)=>{
             console.log("received")
             setMessages(prev=>[...prev,message])
             setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
          })  
-        }) 
+        })
      },[])
 
     function forceRender(){
@@ -78,6 +77,7 @@ export default function Main() {
                 POST('/api/groups/create',{users : [user_id,other_id]},(chat)=>{
                     setSelectedChat(chat);
                     socket.emit('join-room',chat);
+                    setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},500);
                 })
             }
             else{
@@ -85,6 +85,7 @@ export default function Main() {
                 let chat = chats[0];
                 setSelectedChat(chat);
                 socket.emit('join-room',chat);
+                setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},500);
             }
         })
     }
@@ -132,6 +133,7 @@ export default function Main() {
                 })}</div>
             
             <div className='text-white text-2xl m-2'>Chat Rooms</div>
+            <p className='text-red-600'>{selectedChat == null ? 'You are not connected to any chat room!' :''}</p>
             <div className='flex gap-5 flex-col'>{chatRooms.map((chatRoom)=>{
                 let [a,b] = chatRoom.users
                 let otherUser = a._id == currentUser._id ? b :a
@@ -139,7 +141,7 @@ export default function Main() {
                     setSelectedChat(chatRoom);
                     socket.emit('join-room',chatRoom);
                 }}
-                    key={chatRoom._id} className="bg-slate-500 p-5 rounded-xl flex items-center gap-5 hover:bg-slate-800 duration-200 cursor-pointer hover:scale-105">
+                    key={chatRoom._id} className={`${selectedChat && selectedChat._id == chatRoom._id ? 'bg-gray-500':'bg-slate-700'} p-5 rounded-xl flex items-center gap-5 hover:bg-slate-800 duration-200 cursor-pointer hover:scale-105`}>
                      <img src={otherUser.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
                     <div className='text-white text-2xl'>{otherUser.username}</div>
                 </div>)
