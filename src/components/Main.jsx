@@ -4,14 +4,18 @@ import {styles} from './styles'
 import { ORIGIN, POST } from './Utils';
 import {useNavigate} from 'react-router-dom'
 import {io} from 'socket.io-client'
+import Sidebar from './Sidebar';
+import Content from './Content';
 
 const socket = io(ORIGIN)
 export default function Main() {
     let user_id = localStorage.getItem('user-data');
     let navigate = useNavigate();
-    if(user_id == null) {
-        navigate('/')
-    }
+    setTimeout(()=>{
+        if(user_id == null) {
+            navigate('/')
+        }
+    },100)
     let [currentUser,setCurrentUser] = useState(null);
     let [renderState,setRender] = useState(false);
     let [fetchedUsers,setFetchedUsers] = useState([]);
@@ -19,7 +23,7 @@ export default function Main() {
     let [messages,setMessages] = useState([]);
     let [chatRooms,setChatRooms] = useState([]);
     let searchInput = useRef();
-    let messageBox = useRef();
+    
     useEffect(()=>{
         socket.on('connect',()=>{
          console.log("Connection established!");
@@ -36,11 +40,7 @@ export default function Main() {
             setRender(prev=>!prev);
         },300)
     }
-    function Logout(){
-        localStorage.removeItem('user-data');
-        alert("Logged out!");
-        navigate('/')
-    }
+    
     useEffect(()=>{
         POST('/api/users/read',{_id:user_id},(users)=>{
             let user = users[0];
@@ -89,94 +89,29 @@ export default function Main() {
             }
         })
     }
+    function createGroup(){
+        // [ID of people in the group]
+        // [includingYOU,54j4j23jh32,123u1h32h123j,j2311j32n]
 
-    function sendMessage(e){
-        e.preventDefault();
-        let {message} = Object.fromEntries(new FormData(e.target));
-        let messageObj = {
-            content : message,
-            from : user_id,
-            to : selectedChat._id
-        }
-        POST('/api/messages/create', messageObj,(message)=>{
-            setMessages(prev=>[...prev, message])
-            socket.emit('send-message',message);
-            setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
+        let ids = []
+        POST('/api/groups/create',{
+            chatName : groupName,
+            users : ids
         })
-        
-        e.target.reset()
     }
+    
   if(currentUser == null) return;
   return (<>
-  <div className='min-h-screen bg-black'>
-    <div className="flex bg-slate-800 p-5 justify-evenly items-center"> 
-        <div className="flex items-center gap-5 flex-1">
-            <img src={currentUser.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
-            <div className='text-white text-xl'>Logged in as,<span className='text-blue-500'>{currentUser.username}</span></div>
+  <div className='h-screen bg-black'>
+    <div className='h-screen flex'>
+        <div className="bg-slate-900 w-[20vw]">
+            <Sidebar props={{chatRooms,currentUser,selectedChat,setSelectedChat}}/>
         </div>
-        <div onClick={Logout} className='text-red-500 text-2xl hover:scale-105 cursor-pointer duration-200'>Logout</div>
-    </div>
-    <div className='grid grid-cols-2'>
-        <div className='bg-gray-700 p-5'>
-            <div className='text-white text-2xl m-2'>Search</div>
-            <input type="text" ref={searchInput} onInput={searchUser} className={styles.inputBox}/>
-            <div className='flex flex-col gap-5 p-5'>{
-                fetchedUsers.map((user) =>{
-                    return (<div key={user._id} onClick={()=>{
-                        alert("Selected user " + user.username);
-                        selectChat(user._id);
-                        
-                    }} className='flex items-center gap-5 bg-slate-500 rounded-xl p-2 hover:scale-105 duration-200 cursor-pointer'>
-                        <img src={user.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
-                        <div className='text-2xl text-white font-bold'>{user.username}</div>
-                    </div>)
-                })}</div>
-            
-            <div className='text-white text-2xl m-2'>Chat Rooms</div>
-            <p className='text-red-600'>{selectedChat == null ? 'You are not connected to any chat room!' :''}</p>
-            <div className='flex gap-5 flex-col'>{chatRooms.map((chatRoom)=>{
-                let [a,b] = chatRoom.users
-                let otherUser = a._id == currentUser._id ? b :a
-                return (<div onClick={()=>{
-                    setSelectedChat(chatRoom);
-                    socket.emit('join-room',chatRoom);
-                }}
-                    key={chatRoom._id} className={`${selectedChat && selectedChat._id == chatRoom._id ? 'bg-gray-500':'bg-slate-700'} p-5 rounded-xl flex items-center gap-5 hover:bg-slate-800 duration-200 cursor-pointer hover:scale-105`}>
-                     <img src={otherUser.avatarUrl} alt="" className='w-20 h-20 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
-                    <div className='text-white text-2xl'>{otherUser.username}</div>
-                </div>)
-            })}</div>
-        </div>
-        <div className='bg-slate-900 p-5'>
-            <div className='text-xl text-white font-bold'>Chat</div>
-            <div ref={messageBox} className='bg-slate-600 h-[50vh] overflow-y-scroll p-5 flex flex-col gap-5'>{ 
-                messages.map((message)=>{
-                    let fromSelf = message.from._id == user_id
-                    return (<Message key={message._id} props={{message,fromSelf}}/>)
-                })
-            }</div>
-            <div className='p-5'>
-                <form onSubmit={(e)=>{
-                    sendMessage(e)
-                }}className='grid grid-cols-1 gap-5'>
-                    <input type="text" className={styles.inputBox} name="message"/>
-                    <button className={styles.ikeaButton +' p-5'}>SEND</button>
-                </form>
-            </div>
+        <div className="bg-gray-800 w-[80vw]">
+            <Content props={{messages,setMessages,selectedChat,socket,currentUser}}/>
         </div>
     </div>
   </div>
   </>
   )
-}
-
-function Message(props){
-    let {message,fromSelf} = props.props
-    return(<div className={`flex ${fromSelf ? 'flex-row-reverse bg-purple-600' : 'bg-blue-600' } items-center gap-5 rounded-xl p-5`}>
-        <div>
-        <img src={message.from.avatarUrl} alt="" className='w-10 h-10 bg-green-600 rounded-full border-black border-2 hover:scale-105 duration-200 ease-in-out cursor-pointer'/>
-        <div className='text-white text-sm'>{message.from.username}</div>
-        </div>
-        <div className='text-white text-xl'>{message.content}</div>
-    </div>)
 }

@@ -7,9 +7,18 @@ body{
 }
 
 ::-webkit-scrollbar-track{
-  background-color : gray;
+  background-color : rgb(47, 47, 47);
+  border-radius:50px;
 }
 
 ::-webkit-scrollbar-thumb{
-  background-color : rgb(42, 42, 42);
+  background-color : rgb(24, 24, 24);
+  border-radius:50px;
+}
+/* Change the white to any color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
