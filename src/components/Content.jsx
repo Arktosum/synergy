@@ -1,12 +1,33 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { POST } from './Utils';
 
 export default function Content(props) {
   let messageBox = useRef();
-  let {messages,setMessages,selectedChat,socket,currentUser} = props.props
-  setTimeout(()=>{
-    if(messageBox.current)messageBox.current.scrollTop = messageBox.current.scrollHeight
-  },200);
+  let [messages,setMessages] = useState([])
+  let {selectedChat,socket,currentUser} = props.props
+  useEffect(()=>{
+    if(selectedChat == null) return;
+    console.log('got all messages')
+    POST('/api/messages/read',{to:selectedChat._id},(messages)=>{
+        setMessages(messages)
+        setTimeout(()=>{
+          if(messageBox.current) messageBox.current.scrollTop = messageBox.current.scrollHeight
+        },200);  
+    })
+  },[selectedChat])
+
+  useEffect(()=>{
+    socket.off('receive-message').on('receive-message',(message)=>{
+      console.log('received message')
+      setMessages(prev=>[...prev,message])
+      setTimeout(()=>{messageBox.current.scrollTop = messageBox.current.scrollHeight},200);
+    })  
+  },[])
+  
+  
+
+
+
   function sendMessage(message){
     if(message == '') return;
     let messageObj = {
@@ -44,17 +65,20 @@ function Message(props){
   let {message} = props.props
   let user = message.from
   let createdAt = message.createdAt
-  let [date,time] = createdAt.split('T')
-  let[hour,min,rest] = time.split(":")
-  let [year,month,day] = date.split("-")
-  let hourMin = `${day}/${month}/${year} ${hour}:${min}`
+
+  let newDate = new Date(createdAt).toLocaleString()
+  // let [date,time] = createdAt.split('T')
+  // let[hour,min,rest] = time.split(":")
+  // let [year,month,day] = date.split("-")
+  // let hourMin = `${day}/${month}/${year} ${hour}:${min}`
+
 
 
   return (<>
   <div className='flex gap-5 hover:bg-[#253141] duration-300 py-2 px-5'>
     <img src={user.avatarUrl} alt="" className='w-10 h-10 rounded-full bg-green-600 border-2 border-black'/>
     <div>
-      <div className='text-white italic'>{user.username}<span className='px-5 text-sm text-gray-500'>{hourMin}</span></div>
+      <div className='text-white italic'>{user.username}<span className='px-5 text-sm text-gray-500'>{newDate}</span></div>
       <div className="text-white text-lg">{message.content}</div>
     </div>
   </div>
