@@ -9,14 +9,16 @@ export default function Home() {
   let navigate = useNavigate();
   let dispatch = useDispatch();
   let user = useSelector(reducers=>reducers.auth.user);
+
   useEffect(()=>{
-    let user_id = localStorage.getItem('USER_ID')
-    if(!user_id) navigate('/login');
+    let user_id = JSON.parse(localStorage.getItem('USER_ID'))
+    if(!user_id) {navigate('/login');return;}
     if(user == null){
       dispatch(readUser(user_id))
     }
   },[dispatch,navigate,user])
 
+  
   if(!user) return;
   return (<>
     <div className="h-screen flex ">

@@ -7,7 +7,7 @@ export const loginUser = createAsyncThunk('auth/login', async (userData) => {
     const response = await axios.post('http://localhost:3000/users/login', userData)
     return response.data;
   } catch (error) {
-    return error.message;
+    return error.response.data;
   }
 });
 
@@ -16,7 +16,7 @@ export const registerUser = createAsyncThunk('auth/register', async (userData) =
     const response = await axios.post('http://localhost:3000/users/register', userData)
     return response.data;
   } catch (error) {
-    return error.message;
+    return error.response.data;
   }
 });
 
@@ -25,7 +25,7 @@ export const readUser = createAsyncThunk('auth/read', async (id) => {
     const response = await axios.get(`http://localhost:3000/users/${id}`)
     return response.data;
   } catch (error) {
-    return error.message;
+    return error.response.data;
   }
 });
 const authSlice = createSlice({
@@ -42,8 +42,9 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.fulfilled, (state, action) => {
-        localStorage.setItem('USER_ID',action.payload.userId);
-        state.user = action.payload;
+        if(action.payload.error == undefined) {
+          localStorage.setItem('USER_ID',JSON.stringify(action.payload.userId));
+        }
       })
       .addCase(readUser.fulfilled, (state, action) => {
         state.user = action.payload;

@@ -20,20 +20,22 @@ const Signup = () => {
     e.preventDefault();
     dispatch(registerUser({username,email,password}))
     .then((data)=>{
-      if(data.meta.requestStatus == 'fulfilled') {
+      if(data.payload.error == undefined){ // There is no error
         toast.success('Registered successfully! Please login to continue.');
         setTimeout(() => {
           navigate('/login');
         }, 2000); 
+        
       }
-      if(data.meta.requestStatus == 'rejected') toast.error('An error occurred. Please try again later.');
+      else{
+        toast.error('An error occurred. Please try again later.');
+      }
     })
   }
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-[url('https://cdn.wallpapersafari.com/77/72/HhFPus.jpg')]">
       <div className="w-full max-w-md">
-        <h2 className="text-3xl font-extrabold text-white text-center">Sign up</h2>
+        <h2 className="text-5xl font-extrabold text-white text-center hurricane">Sign up</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSignup}>
           <div className="rounded-md shadow-md p-6">
             <div>

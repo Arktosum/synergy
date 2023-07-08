@@ -20,18 +20,22 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginUser({email,password}))
     .then((data)=>{
-      if(data.meta.requestStatus == 'fulfilled') {
-        navigate('/profile');
-        toast.success("Login successful!");
+      if(data.payload.error != undefined){
+        toast.error(data.payload.error);
       }
-      if(data.meta.requestStatus == 'rejected') toast.error("Login failed!");
+      else{
+        toast.success(data.payload.message);
+          setTimeout(()=>{
+            navigate('/');
+          },1000)
+      }
     })
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-[url('https://cdn.wallpapersafari.com/77/72/HhFPus.jpg')]">
       <div className="w-full max-w-md">
-        <h2 className="text-3xl font-extrabold text-white text-center">Login</h2>
+        <h2 className="text-5xl font-extrabold text-white text-center hurricane">Login</h2>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           <div className="rounded-md shadow-md p-6">
             <div>

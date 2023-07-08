@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/synergy', {
+mongoose.connect('mongodb+srv://siddhujaykay2:shiine1984@synergy.en8nmpm.mongodb.net/main', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

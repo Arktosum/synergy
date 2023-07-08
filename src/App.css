@@ -1,42 +1,52 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Hurricane&family=Roboto+Flex:opsz@8..144&display=swap');
+
+
+*{
+  font-family: 'Roboto Flex', sans-serif;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.hurricane {
+  font-family: 'Hurricane', cursive;
 }
 
-@keyframes logo-spin {
+::-webkit-scrollbar {
+  width: 10px; /* Adjust the width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #262626; /* Set the background color of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Set the color of the scrollbar thumb */
+  border-radius: 5px; /* Set the border radius of the scrollbar thumb */
+}
+
+
+.slide-in{
+  animation: slide-in 0.5s ease-in-out forwards;
+}
+
+@keyframes slide-in {
   from {
-    transform: rotate(0deg);
+    width : 0;
+    opacity: 0;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  to{
+    width : 20vw;
+    opacity: 1;
   }
 }
 
-.card {
-  padding: 2em;
+.slide-out{
+  animation: slide-out 0.5s ease-in-out forwards;
 }
 
-.read-the-docs {
-  color: #888;
+@keyframes slide-out {
+  from {
+    width : 20vw;
+  }
+  to{
+    width : 0;
+  }
 }

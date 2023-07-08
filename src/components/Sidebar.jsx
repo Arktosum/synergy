@@ -1,130 +1,108 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+/* eslint-disable react/prop-types */
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from './redux/authSlice';
-
+import { homeIcon,logoutIcon,messageIcon,notificationIcon,profileIcon,searchIcon } from './icons';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { ENDPOINT } from './Utils';
 
 const Sidebar = () => {
-  let navigate = useNavigate();
   let dispatch = useDispatch();
   let user = useSelector(reducers=>reducers.auth.user);
-
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   return (<>
-    <div className="flex flex-col h-full w-[20vw] bg-gray-800 text-white">
-      {/* Logo/Header */}
-      <div className="py-4 px-6 bg-gray-900">
-        <h1 className="text-2xl font-bold">Synergy</h1>
-      </div>
-
-      {/* User Info */}
-      <div className="py-4 px-6 flex flex-col items-center">
-        <div className="w-24 h-24 rounded-full bg-gray-700">
-          <img src={`http://robohash.org/${user.email}`} alt="" />
+    <div className="flex flex-col h-full w-[20vw] bg-[#131313] text-white">
+      <div className='mx-auto text-5xl my-5 hurricane'>Synergy</div>
+      <img src={`https://robohash.org/${user.email}`} className="w-20 h-20 rounded-full border-[1px] mx-auto border-gray-500" alt="" />
+      <div className='mx-auto text-sm my-2 italic text-blue-300'>@{user.username}</div>
+      <div></div>
+      <div className='w-full flex flex-col gap-5 my-5 p-3'>
+        <Link to="/"><div className='hover:bg-[#1D1D1D] w-full p-3 cursor-pointer duration-200 rounded-xl flex gap-5'>
+          <span>{homeIcon}</span>
+          <span>Home</span>
+        </div></Link>
+        <div onClick={()=>setIsSearchOpen(prev=>!prev)}
+        className='hover:bg-[#1D1D1D] w-full p-3 cursor-pointer duration-200 rounded-xl flex gap-5'>
+          <span>{searchIcon}</span>
+          <span>Search</span>
         </div>
-        <h2 className="text-lg font-medium mt-2">@{user.username}</h2>
+        <Link to="/messages"><div className='hover:bg-[#1D1D1D] w-full p-3 cursor-pointer duration-200 rounded-xl flex gap-5'>
+          <span>{messageIcon}</span>
+          <span>Messages</span>
+        </div></Link>
+        <Link to="/profile"><div className='hover:bg-[#1D1D1D] w-full p-3 cursor-pointer duration-200 rounded-xl flex gap-5'>
+          <span>{profileIcon}</span>
+          <span>Profile</span>  
+        </div></Link>
+        <Link to="/notifications"><div className='hover:bg-[#1D1D1D] w-full p-3 cursor-pointer duration-200 rounded-xl flex gap-5'>
+          <span className='relative'>
+            <span className='absolute -top-4 left-4 bg-red-600 rounded-full w-6 h-6 text-center px-1'>{user.requests.length}</span>
+            {notificationIcon}
+          </span>
+          <span>Notifications</span>  
+
+        </div></Link>
       </div>
-
-      {/* Navigation */}
-      <nav className="flex-grow px-6 py-4">
-        <ul className="space-y-2">
-          <li>
-            <Link
-              to="/"
-              className="block py-2 px-4 rounded hover:bg-gray-700"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <div
-              className="block py-2 px-4 rounded hover:bg-gray-700 cursor-pointer"
-              onClick={()=>{setIsSearchOpen(prev=>!prev)}}>
-            Search
-            </div>
-          </li>
-          <li>
-            <Link
-              to="/messages"
-              className="block py-2 px-4 rounded hover:bg-gray-700"
-            >
-              Messages
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/profile"
-              className="block py-2 px-4 rounded hover:bg-gray-700"
-            >
-              Profile
-            </Link>
-          </li>
-        </ul>
-      </nav>
-
-      {/* Logout */}
-      <div className="py-4 px-6">
-        <button className="block w-full py-2 px-4 rounded bg-red-600 hover:bg-red-700 text-white" onClick={()=>{
-          dispatch(logoutUser())
-          navigate('/login');
-        }}>
-          Logout
-        </button>
+      <div onClick={()=>dispatch(logoutUser())}
+      className='mx-auto bg-red-600 px-5 py-2 rounded-xl hover:bg-[#c61e1e] cursor-pointer flex gap-2'>
+        <span>{logoutIcon}</span>
+        <span>Logout</span>
       </div>
     </div>
-    { isSearchOpen && <Search />}
+    {
+    <div className={`${isSearchOpen ? 'slide-in' : 'slide-out'} w-[20vw] h-full bg-[#141414] border-l-[1px] border-l-gray-600 absolute left-[16.5%]`}>
+      {isSearchOpen &&<Search/>}
+    </div>
+   }
     </>);
 };
-const dummyUsers = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Smith' },
-  { id: 3, name: 'Alice Johnson' },
-  { id: 4, name: 'Bob Anderson' },
-];
-const Search = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState([]);
 
-  const handleSearch = () => {
-    // Perform search logic here (e.g., fetch users based on the searchTerm)
-    // Replace the following example logic with your own search implementation
-    const filteredUsers = dummyUsers.filter((user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setUsers(filteredUsers);
-  };
+function Search() {
+  let [pattern,setPattern] = useState("");
+  let [users,setUsers] = useState([]);
 
-  const handleChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
+  useEffect(()=>{
+    if(!pattern){
+      setUsers([]);
+      return;
+    }
+    axios.get(ENDPOINT(`/users/search/${pattern}`)).then((res)=>{
+      setUsers(res.data)
+    })
+  },[pattern])
+  
+  let userElements = users.map((user,i)=>{
+    return <User key={i} props={{user}}/>
+  })
   return (
-    <div className="w-20vw bg-gray-600">
-      <input
-        type="text"
-        className="w-full p-2 mb-2"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={handleChange}
-      />
-      <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={handleSearch}>
-        Search
-      </button>
-
-      {users.length > 0 ? (
-        <div className="mt-4">
-          <h2 className="text-lg font-bold mb-2">Users:</h2>
-          <ul>
-            {users.map((user) => (
-              <li key={user.id}>{user.name}</li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p className="mt-4">No users found.</p>
-      )}
+    <div className='w-full h-full p-3 flex flex-col items-center'>
+      <div className='text-white text-5xl hurricane mx-auto'>Search</div>
+      <div className='my-5 w-full'>
+        <input value={pattern} onChange={(e)=>{setPattern(e.target.value)}}
+        type="text" className="text-white bg-inherit border-[1px] border-gray-600 w-full py-1 rounded-sm p-2"/>
+      </div>
+      <hr />
+      <div className='w-full h-full flex flex-col gap-5 overflow-auto'>
+        {userElements.length == 0 ? <>
+        <div className='text-gray-600 text-sm mx-auto my-auto'>Search for new friends!</div>
+        </>:userElements}
+      </div>
     </div>
-  );
-};
+  )
+}
 
+function User(props){
+  let {user} = props.props;
+  return (<>
+        <Link to={`/profile/${user._id}`}>
+          <div className='flex items-center gap-5 hover:bg-[#232323] duration-200 p-2 rounded-xl cursor-pointer'>
+            <img src={`https://robohash.org/${user.email}`}
+            className='w-10 h-10 rounded-full border-[1px] border-gray-600'
+            alt="" />
+          <div className='text-white text-sm'>@{user.username}</div>
+          </div>
+        </Link>
+    </>)
+}
 export default Sidebar;
