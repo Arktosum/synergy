@@ -1,8 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import {useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { sendFriendRequest } from "./redux/userSlice";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchRoom, sendFriendRequest } from "./redux/userSlice";
 import { ToastContainer, toast } from "react-toastify";
 import { ENDPOINT } from "./Utils";
 
@@ -13,8 +13,10 @@ import { ENDPOINT } from "./Utils";
 // else send friend request
 export default function Profile() {
   const { userId } = useParams();
+  let navigate = useNavigate()
   let [viewUser,setviewUser] = useState(null);
-  let myProfile = userId == null
+  let my_user =  useSelector(reducers=>reducers.auth.user);
+  let myProfile = userId == null || userId == my_user._id
   let dispatch = useDispatch();
   
   useEffect(()=>{
@@ -24,7 +26,6 @@ export default function Profile() {
       })
     }
   },[userId])
-  let my_user =  useSelector(reducers=>reducers.auth.user);
   if(myProfile){
     viewUser = my_user
   }
@@ -42,8 +43,20 @@ export default function Profile() {
   })
   function handleRequest(){
     dispatch(sendFriendRequest({senderId : my_user._id ,receiverId :viewUser._id })).then((res)=>{
+      console.log(res.payload)
       if(res.payload.error == undefined) {
         toast.success(res.payload.message);
+      }
+      else {  
+        toast.error(res.payload.error)
+      }
+    })
+  }
+  function messageUser(){
+    let participants = [my_user._id,viewUser._id]
+    dispatch(fetchRoom(participants)).then((res)=>{
+      if(res.payload.error == undefined) {
+        navigate(`/messages/${res.payload.room._id}`);
       }
       else {  
         toast.error(res.payload.error)
@@ -71,6 +84,10 @@ export default function Profile() {
                <div onClick={handleRequest}
                 className="text-white cursor-pointer bg-blue-500 px-5 py-2 rounded-xl hover:bg-blue-600 duration-200">
                   Send Request
+                </div>
+                <div onClick={messageUser}
+                className="text-black cursor-pointer bg-white px-5 py-2 rounded-xl hover:bg-[#bababa] duration-200">
+                  Message
                 </div>
                </>}
             </div>

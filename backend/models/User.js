@@ -19,10 +19,15 @@ const userSchema = new mongoose.Schema({
     },
     status : {
       type : String,
-      enum : ['pending','accepted','rejected'],
-      default : 'pending'
+      enum : ['pending','accepted','rejected']
     }
-  }]
+  }],
+  rooms: [
+    {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : 'Room'
+    }
+  ]
 });
 
 const User = mongoose.model('User', userSchema);

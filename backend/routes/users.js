@@ -95,6 +95,32 @@ router.get('/search/:pattern', async (req, res) => {
 });
 
 
+// API endpoint to fetch requests for a specific user
+router.get('/requests/read/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user with the given ID and populate only the requests field
+    const user = await User.findById(userId).populate({
+      path: 'requests',
+      populate: {
+        path: 'requester',
+        select: 'username email'
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user.requests);
+  } catch (error) {
+    console.error('Error fetching user requests', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 // API endpoint to send a friend request
 router.post('/requests/send', async (req, res) => {
   try {
@@ -143,29 +169,88 @@ router.post('/requests/send', async (req, res) => {
   }
 });
 
-
-
-// API endpoint to fetch requests for a specific user
-router.get('/requests/read/:userId', async (req, res) => {
+router.post('/requests/cancel', async (req, res) => {
   try {
-    const { userId } = req.params;
+    const senderId = req.body.senderId;
+    const receiverId = req.body.receiverId;
 
-    // Find the user with the given ID and populate only the requests field
-    const user = await User.findById(userId).populate({
-      path: 'requests',
-      populate: {
-        path: 'requester',
-        select: 'username email'
-      }
-    });
+     // Check if both sender and receiver exist
+    const [sender, receiver] = await Promise.all([
+      User.findById(senderId),
+      User.findById(receiverId)
+    ]);
 
-    if (!user) {
+    if (!sender || !receiver) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Check if outgoing request exists from sender to receiver
+    const existingRequest = sender.requests.find(request =>
+      request.requester.equals(receiverId) && request.type === 'outgoing'
+    );
+    if (!existingRequest) {
+      return res.status(400).json({ error: 'Request not found' });
+    }
+    sender.requests = sender.requests.filter((request)=>!(request.requester.equals(receiverId) && request.type === 'outgoing'))
+    receiver.requests = receiver.requests.filter((request)=>!(request.requester.equals(senderId) && request.type === 'incoming'))
+    await Promise.all([receiver.save(), sender.save()]);
+    res.status(200).json({ message: "Cancelled Request Successfuly" })
+  }
+  catch (error) {
+      console.error('Error sending friend request', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+// API endpoint to accept or reject a friend request
+router.post('/requests/acceptReject', async (req, res) => {
+  try {
+    const senderId = req.body.senderId;
+    const receiverId = req.body.receiverId;
+    const acceptReject = req.body.acceptReject;
+
+    // Check if both sender and receiver exist
+    const [sender, receiver] = await Promise.all([
+      User.findById(senderId),
+      User.findById(receiverId)
+    ]);
+
+    if (!sender || !receiver) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(user.requests);
+    const existingRequest = receiver.requests.find(request =>
+      request.requester.equals(senderId) && request.type === 'outgoing'
+    );
+
+    if (!existingRequest) {
+      return res.status(400).json({ error: 'Friend request not sent' });
+    }
+    let indSender = sender.requests.findIndex((x)=> x.requester == receiverId);
+    let indReceiver = receiver.requests.findIndex((x)=> x.requester == senderId)
+    sender.requests[indSender] = {
+      requester: receiverId,
+      type: 'outgoing',
+      status: acceptReject
+    }
+    receiver.requests[indReceiver] ={
+      requester: senderId,
+      type: 'incoming',
+      status: acceptReject
+    }
+    let message;
+    if(acceptReject == 'accepted'){
+      // Add both to friends list
+      sender.friends.push(receiverId)
+      receiver.friends.push(senderId)
+      message = 'Friend request accepted!';
+    }
+    else{
+      message = 'Friend request Rejected!';
+    }
+    await Promise.all([receiver.save(), sender.save()]);
+
+    res.json({ message });
   } catch (error) {
-    console.error('Error fetching user requests', error);
+    console.error('Error sending friend request', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -174,31 +259,33 @@ router.post('/requests/cancel', async (req, res) => {
   try {
     const senderId = req.body.senderId;
     const receiverId = req.body.receiverId;
-    console.log(req.body);
 
-    // Find the sender and update their requests array
-    const sender = await User.findByIdAndUpdate(senderId, {
-      $pull: { requests: { requester: receiverId } 
-    }});
+     // Check if both sender and receiver exist
+    const [sender, receiver] = await Promise.all([
+      User.findById(senderId),
+      User.findById(receiverId)
+    ]);
 
-    if (!sender) {
-      return res.status(404).json({ error: 'Sender not found' });
+    if (!sender || !receiver) {
+      return res.status(404).json({ error: 'User not found' });
     }
-
-    // Find the receiver and update their requests array
-    const receiver = await User.findOneAndUpdate(receiverId, {
-      $pull: { requests: { requester: senderId }
-    }});
-
-    if (!receiver) {
-      return res.status(404).json({ error: 'Receiver not found' });
+    // Check if outgoing request exists from sender to receiver
+    const existingRequest = sender.requests.find(request =>
+      request.requester.equals(receiverId) && request.type === 'outgoing'
+    );
+    if (!existingRequest) {
+      return res.status(400).json({ error: 'Request not found' });
     }
-
-    res.json({ message: 'Request canceled successfully' });
-  } catch (error) {
-    console.error('Error canceling request', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    sender.requests = sender.requests.filter((request)=>!(request.requester.equals(receiverId) && request.type === 'outgoing'))
+    receiver.requests = receiver.requests.filter((request)=>!(request.requester.equals(senderId) && request.type === 'incoming'))
+    await Promise.all([receiver.save(), sender.save()]);
+    res.status(200).json({ message: "Cancelled Request Successfuly" })
   }
+  catch (error) {
+      console.error('Error sending friend request', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
+
 
 module.exports = router;

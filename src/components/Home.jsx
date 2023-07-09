@@ -3,6 +3,7 @@ import Sidebar from './Sidebar'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux';
 import { readUser } from './redux/authSlice';
+
 // Contains Side bar and Feed
 
 export default function Home() {

@@ -20,6 +20,7 @@ const App = () => {
         <Route path="/" element={<Home />}>
           <Route exact path="/" element={<Feed />} />
           <Route path="messages" element={<Messages />} />
+          <Route path="messages/:roomId" element={<Messages />} />
           <Route exact path="profile" element={<Profile />} />
           <Route path="profile/:userId" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
