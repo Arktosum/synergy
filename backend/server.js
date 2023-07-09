@@ -1,8 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const http = require('http');
 const usersRouter = require('./routes/users');
 const roomsRouter = require('./routes/rooms');
-const cors = require('cors');
 
 const app = express();
 const port = 3000;
@@ -28,22 +29,20 @@ const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-// Initialize Socket.io
-const io = require('socket.io')(server);
+const io = require('socket.io')(server,{
+  cors:{
+    pingTimeOut:60000,
+    origin: '*'
+  }
+})
 
-// Socket.io connection event
-io.on('connection', (socket) => {
-  // When a user joins a room
-  console.log(socket.id + "Has connected!")
-  socket.on('join-room', (roomId) => {
-    // Join the specified room
-    socket.join(roomId);
+io.on("connection", (socket) => {
+  socket.on("send-message", (message) => {
+    socket.to(message.room).emit("receive-message", message);
   });
-
-  // When a user sends a message
-  socket.on('send-message', (roomId, message) => {
-    // Broadcast the message to all users in the room, except the sender
-    socket.to(roomId).emit('receive-message', message);
+  socket.on("join-room", (room) => {
+    console.log(`Joined Room | ${room}`);
+    socket.join(room);
   });
 });
 

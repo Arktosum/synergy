@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {io} from 'socket.io-client'
 
 const socketSlice = createSlice({
     name: 'socket',
     initialState: {
-      socket: null
+      socket: io('http://localhost:3000')
     },
     reducers: {
 

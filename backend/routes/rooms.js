@@ -48,4 +48,31 @@ router.get('/:roomId', async (req, res) => {
     }
 });
 
+
+router.post('/:roomId/sendMessage', async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const  message  = req.body;
+    console.log(message)
+    // message : {from : UserID , content : String}
+    // Find the room by its ID
+    const room = await Room.findById(roomId);
+
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    // Append the message to the messages array
+    room.messages.push(message);
+
+    // Save the updated room
+    await room.save();
+
+    return res.status(201).json({ room });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
