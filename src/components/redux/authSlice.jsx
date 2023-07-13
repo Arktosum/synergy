@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { ENDPOINT } from '../Utils';
 
 
 export const loginUser = createAsyncThunk('auth/login', async (userData) => {
   try {
-    const response = await axios.post('http://localhost:3000/users/login', userData)
+    const response = await axios.post(ENDPOINT('/users/login'), userData)
     return response.data;
   } catch (error) {
     return error.response.data;
@@ -13,7 +14,7 @@ export const loginUser = createAsyncThunk('auth/login', async (userData) => {
 
 export const registerUser = createAsyncThunk('auth/register', async (userData) => {
   try {
-    const response = await axios.post('http://localhost:3000/users/register', userData)
+    const response = await axios.post(ENDPOINT('/users/register'), userData)
     return response.data;
   } catch (error) {
     return error.response.data;
@@ -22,7 +23,7 @@ export const registerUser = createAsyncThunk('auth/register', async (userData) =
 
 export const readUser = createAsyncThunk('auth/read', async (id) => {
   try {
-    const response = await axios.get(`http://localhost:3000/users/${id}`)
+    const response = await axios.get(ENDPOINT(`/users/${id}`))
     return response.data;
   } catch (error) {
     return error.response.data;

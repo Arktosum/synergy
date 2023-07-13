@@ -109,10 +109,10 @@ function MessageBox(){
       from : user._id,
       content : message,
     }
-    await axios.post(ENDPOINT(`/rooms/${roomId}/sendMessage`),MONGO_MESSAGE)
     setMessages((prev)=>[...prev,{...MONGO_MESSAGE,createdAt:new Date().toUTCString()}])
-    setMessage('')
     scrollToEnd();
+    await axios.post(ENDPOINT(`/rooms/${roomId}/sendMessage`),MONGO_MESSAGE)
+    setMessage('')
   }
 
   if(!room){

@@ -38,7 +38,19 @@ const io = require('socket.io')(server,{
 
 io.on("connection", (socket) => {
   socket.on("send-message", (message) => {
+    //  {
+    //     participants,
+    //     roomId
+    //     from,
+    //     content
+    // }
     socket.to(message.room).emit("receive-message", message);
+    for(let participant of message.participants){
+      if(participant == from) continue;
+        socket.join(participant);
+        socket.to(participant).emit("receive-notification",message);
+        socket.leave(participant);
+    }
   });
   socket.on("join-room", (room) => {
     console.log(`Joined Room | ${room}`);
