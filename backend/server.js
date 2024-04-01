@@ -1,62 +1,54 @@
+// server.js
+
+require('dotenv').config(); // Load environment variables from .env file
+
 const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
 const http = require('http');
-const usersRouter = require('./routes/users');
-const roomsRouter = require('./routes/rooms');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const socketio = require('socket.io');
+const userRoutes = require('./routes/userRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+const authRoutes = require('./routes/authRoutes');
 
+// Initialize Express app
 const app = express();
-const port = 3000;
+const server = http.createServer(app);
+const io = socketio(server);
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://siddhujaykay2:shiine1984@synergy.en8nmpm.mongodb.net/main', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+app.use(express.json())
+app.use(cors())
+// Connect to MongoDB database
+mongoose.connect(process.env.MONGODB_URI);
+
+// Use routes
+app.use('/users', userRoutes);
+app.use('/messages', messageRoutes);
+app.use('/auth', authRoutes);
+
+// Socket.IO implementation for real-time messaging
+io.on('connection', (socket) => {
+  console.log('New socket connection: ', socket.id);
+
+  // Handle incoming messages
+  socket.on('sendMessage', (message) => {
+    // Save message to database
+    // Emit message to appropriate recipient(s)
+    io.emit('newMessage', message);
+  });
+
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected: ', socket.id);
+  });
 });
 
-// Middleware
-app.use(express.json());
-app.use(cors({
-  origin : "*"
-})); // Enable CORS
 
-// Routes
-app.use('/users', usersRouter);
-app.use('/rooms', roomsRouter);
-
-// Start the server
-const server = app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-const io = require('socket.io')(server,{
-  cors:{
-    pingTimeOut:60000,
-    origin: '*'
-  }
+app.get('/',(req,res)=>{
+  res.send("<h1>Hello from the backend!</h1>")
 })
-
-io.on("connection", (socket) => {
-  socket.on("send-message", (message) => {
-    //  {
-    //     participants,
-    //     roomId
-    //     from,
-    //     content
-    // }
-    socket.to(message.room).emit("receive-message", message);
-    for(let participant of message.participants){
-      if(participant == from) continue;
-        socket.join(participant);
-        socket.to(participant).emit("receive-notification",message);
-        socket.leave(participant);
-    }
-  });
-  socket.on("join-room", (room) => {
-    console.log(`Joined Room | ${room}`);
-    socket.join(room);
-  });
+// Start the server
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
-
-
-
