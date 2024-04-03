@@ -1,24 +1,19 @@
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-
-const authMiddleware = async (req, res, next) => {
-  try {
-    // Extract token from request headers
-    const token = req.header('Authorization').replace('Bearer ', '');
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Find user by id
-    const user = await User.findOne({ _id: decoded._id, 'tokens.token': token });
-    if (!user) {
-      throw new Error();
-    }
-    req.token = token;
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Authentication failed' });
+// Middleware to verify JWT
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).send("Access denied. No token provided");
   }
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send("Invalid token");
+    }
+    req.userId = decoded.userId;
+    next();
+  });
 };
 
-module.exports = authMiddleware;
+module.exports = verifyToken;
