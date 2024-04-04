@@ -1,17 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
-import store from "./app/store.ts";
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import NotFoundPage from "./components/NotFoundPage.tsx";
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    errorElement: <NotFoundPage />,
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    </BrowserRouter>
-  </Provider>
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );
