@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { registerUser } from "../features/auth/authSlice";
+import { registerUser } from "../features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Register() {

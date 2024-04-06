@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from '../../app/axios'
+import axios from '../app/axios'
 import { AxiosError } from 'axios'
-import { User } from '../user/userSlice'
+import { User } from './userSlice'
+import { Socket } from 'socket.io-client'
 
 const REGISTER_ENDPOINT = '/auth/register'
 const LOGIN_ENDPOINT = '/auth/login'
@@ -34,7 +35,6 @@ export const loginUser = createAsyncThunk(
   },
 )
 
-
 export const testUser = createAsyncThunk(
   'auth/testUser',
   async (_,{ rejectWithValue }) => {
@@ -49,33 +49,33 @@ export const testUser = createAsyncThunk(
   },
 )
 
-
 export interface AuthState {
   token: string | null,
-  user_id : string | null
+  user_id : string | null,
+  socket : Socket | null
 }
 
 const initialState: AuthState = {
   token: localStorage.getItem('token'),
-  user_id : localStorage.getItem('user-id')
+  user_id : localStorage.getItem('user-id'),
+  socket : null,
 }
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setSocket : (state,action)=>{
+      state.socket = action.payload
+    },
     logoutUser: (state) =>{
       state.token = null;
       state.user_id = null;
       localStorage.removeItem('token');
+      localStorage.removeItem('user-id');
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(registerUser.rejected, (state, action ) => {
-    })
-    builder.addCase(registerUser.fulfilled, (state, action ) => {
-
-    })
     builder.addCase(loginUser.fulfilled,(state,action)=>{
       state.token = action.payload.token;
       state.user_id = action.payload.user._id;
@@ -86,6 +86,6 @@ export const authSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { logoutUser } = authSlice.actions
+export const { logoutUser , setSocket} = authSlice.actions
 
 export default authSlice.reducer

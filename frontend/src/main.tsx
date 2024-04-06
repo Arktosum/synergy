@@ -13,6 +13,12 @@ import Register from "./components/Register.tsx";
 import Dashboard from "./components/Dashboard.tsx";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
+import io from "socket.io-client";
+import { setSocket } from "./features/authSlice.ts";
+
+const socket = io("http://localhost:5000");
+
+store.dispatch(setSocket(socket));
 
 const router = createBrowserRouter([
   {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { loginUser } from "../features/auth/authSlice";
+import { loginUser } from "../features/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {

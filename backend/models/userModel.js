@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    rooms : [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room",
+      }
+    ],
     requests: [
       {
         user: {

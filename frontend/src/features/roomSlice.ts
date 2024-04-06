@@ -1,15 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from '../../app/axios'
+import axios from '../app/axios'
 import { AxiosError } from 'axios'
 
-const FETCH_USER_ENDPOINT = '/user'
+const CREATE_ROOM_ENDPOINT = '/room'
 
 
-export const fetchUserbyId = createAsyncThunk(
-  'user/fetchUserbyId',
-  async (user_id : string ,{ rejectWithValue }) => {
+export const createRoom = createAsyncThunk(
+  'room/createRoom',
+  async (payload : {participants : User[],admins : User[] } ,{ rejectWithValue }) => {
     try{
-      const response = await axios.get(FETCH_USER_ENDPOINT+"/"+user_id);
+      const response = await axios.post(CREATE_ROOM_ENDPOINT+"/create",payload);
       return response.data
     }
     catch(err : unknown){
@@ -41,8 +41,8 @@ export const userSlice = createSlice({
 
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchUserbyId.fulfilled,(state,action)=>{
-      state.user = action.payload;
+    builder.addCase(createRoom.fulfilled,(state,action)=>{
+        console.log("Room created",action.payload)
     })
   }
 })
