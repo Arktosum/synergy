@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from '../app/axios'
 import { AxiosError } from 'axios'
-import { User } from './userSlice'
 import { Socket } from 'socket.io-client'
 
 const REGISTER_ENDPOINT = '/auth/register'
@@ -9,7 +8,7 @@ const LOGIN_ENDPOINT = '/auth/login'
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async (user : User,{ rejectWithValue }) => {
+  async (user : {username: string,email:string,password: string,},{ rejectWithValue }) => {
     try{
       const response = await axios.post(REGISTER_ENDPOINT,user);
       return response.data
@@ -50,42 +49,31 @@ export const testUser = createAsyncThunk(
 )
 
 export interface AuthState {
-  token: string | null,
   user_id : string | null,
   socket : Socket | null
 }
-
 const initialState: AuthState = {
-  token: localStorage.getItem('token'),
   user_id : localStorage.getItem('user-id'),
   socket : null,
 }
-
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setSocket : (state,action)=>{
-      state.socket = action.payload
-    },
     logoutUser: (state) =>{
-      state.token = null;
       state.user_id = null;
-      localStorage.removeItem('token');
       localStorage.removeItem('user-id');
     }
   },
   extraReducers: (builder) => {
     builder.addCase(loginUser.fulfilled,(state,action)=>{
-      state.token = action.payload.token;
-      state.user_id = action.payload.user._id;
-      localStorage.setItem('token', action.payload.token);
-      localStorage.setItem('user-id', action.payload.user._id);
+      state.user_id = action.payload._id;
+      localStorage.setItem('user-id', action.payload._id);
     })
   }
 })
 
 // Action creators are generated for each case reducer function
-export const { logoutUser , setSocket} = authSlice.actions
+export const { logoutUser} = authSlice.actions
 
 export default authSlice.reducer

@@ -12,10 +12,10 @@ export default function Register() {
     password: "",
   };
   const [formData, setFormData] = useState(INIT_USER);
-  const token = useAppSelector((state) => state.auth.token);
+  const user_id = useAppSelector((state) => state.auth.user_id);
 
   useEffect(() => {
-    if (token) navigate("/dashboard");
+    if (user_id) navigate("/dashboard");
   });
 
   async function handleSubmit(
@@ -49,18 +49,6 @@ export default function Register() {
         className="p-5 bg-gray-600 flex flex-col w-1/2 gap-5"
       >
         <div>
-          <label htmlFor="username">Username</label>
-          <input
-            onChange={handleChange}
-            type="text"
-            name="username"
-            value={formData?.username}
-            placeholder="username"
-            className=""
-            required
-          />
-        </div>
-        <div>
           <label htmlFor="email">Email</label>
           <input
             onChange={handleChange}
@@ -70,8 +58,23 @@ export default function Register() {
             placeholder="Email"
             className=""
             required
+            autoComplete="email"
           />
         </div>
+        <div>
+          <label htmlFor="username">Username</label>
+          <input
+            onChange={handleChange}
+            type="text"
+            name="username"
+            value={formData?.username}
+            placeholder="username"
+            className=""
+            required
+            autoComplete='username'
+          />
+        </div>
+
         <div>
           <label htmlFor="password">Password</label>
           <input
@@ -82,6 +85,7 @@ export default function Register() {
             placeholder="password"
             className=""
             required
+            autoComplete="current-password"
           />
         </div>
 

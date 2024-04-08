@@ -1,8 +1,6 @@
 // controllers/todoController.js
 const User = require("../models/userModel");
 
-
-
 exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -23,14 +21,15 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.updateUser = async (req, res) => {
+exports.searchUserbyName = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+    let username = req.params.username;
+    let user = await User.find({
+      username: { $regex: username, $options: "i" },
     });
     res.json(user);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 

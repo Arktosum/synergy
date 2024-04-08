@@ -2,10 +2,15 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
-require("dotenv").config();
+require("dotenv").config({
+  path: "../.env",
+});
 const socketio = require("socket.io");
+const cookieParser = require("cookie-parser");
+
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 const userRouter = require("./routes/userRoutes");
 const authRouter = require("./routes/authRoutes");
 const roomRouter = require("./routes/roomRoutes");
@@ -32,23 +37,22 @@ const expressServer = app.listen(PORT, () => {
   console.log(`Server online! : http://localhost:${PORT}`);
 });
 
-const io = new socketio.Server(expressServer,{
-  cors : {
-    origin : "*"
-  }
-})
+const io = new socketio.Server(expressServer, {
+  cors: {
+    origin: "*",
+  },
+});
 
-io.on('connection',(socket)=>{
+io.on("connection", (socket) => {
   console.log(`${socket.id} has connected!`);
 
-  socket.on('send-message',(message)=>{
-    io.emit('receive-message', message)
-  })
-  socket.on('disconnect',()=>{
+  socket.on("send-message", (message) => {
+    io.emit("receive-message", message);
+  });
+  socket.on("disconnect", () => {
     console.log(`${socket.id} has disconnected!`);
-  })
-})
-
+  });
+});
 
 /*
   To all clients: io.emit()

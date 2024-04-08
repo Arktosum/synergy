@@ -11,10 +11,10 @@ export default function Login() {
     password: "",
   };
   const [formData, setFormData] = useState(INIT_USER);
-  const token = useAppSelector((state) => state.auth.token);
+  const user_id = useAppSelector((state) => state.auth.user_id);
 
   useEffect(() => {
-    if (token) navigate("/dashboard");
+    if (user_id) navigate("/dashboard");
   });
 
   async function handleSubmit(
