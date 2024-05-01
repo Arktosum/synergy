@@ -1,45 +1,38 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import "./index.css";
-
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
-import NotFoundPage from "./components/NotFoundPage.tsx";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./components/Login.tsx";
-import Register from "./components/Register.tsx";
+import ErrorPage from "./components/ErrorPage.tsx";
+import Root from "./components/Root.tsx";
+import PrivateRoute from "./components/PrivateRoute.tsx";
 import Dashboard from "./components/Dashboard.tsx";
-import { store } from "./app/store";
-import { Provider } from "react-redux";
-
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace={true} />,
-    errorElement: <NotFoundPage />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
-    children: [],
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />,
+          },
+        ],
+      },
+    ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  </Provider>
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );
