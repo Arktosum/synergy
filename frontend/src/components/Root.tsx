@@ -1,25 +1,25 @@
-import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+// import { isAuthorized } from "../features/userSlice";
+// import { PropsWithChildren, useEffect } from "react";
 
-export default function Root() {
-  const [auth,setAuth] = useState(false);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (auth) {
-      navigate("/dashboard");
-    } else {
-      navigate("/login");
-    }
-  }, [auth, navigate]);
+// export default function Landing({ children }: PropsWithChildren) {
+//   const authorized = isAuthorized();
+//   const navigate = useNavigate();
+//   useEffect(() => {
+//     if (authorized) {
+//       navigate("/dashboard", { replace: true });
+//     } else {
+//       navigate("/login", { replace: true });
+//     }
+//   }, [authorized, navigate]);
+
+//   return children;
+// }
+
+export default function Layout() {
   return (
-    <>
-      <div>ROOT</div>
-      <button
-        onClick={() => {
-          setAuth((prev) => !prev);
-        }}
-      >Toggle</button>
+    <main>
       <Outlet />
-    </>
+    </main>
   );
 }

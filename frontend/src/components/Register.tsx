@@ -5,7 +5,7 @@ import { useAppDispatch } from "../app/hooks";
 import { loginUser } from "../features/userSlice";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
   const INITIAL_FORM_DATA = {
     email: "",
     password: "",
