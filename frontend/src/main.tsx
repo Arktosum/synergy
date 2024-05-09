@@ -14,26 +14,26 @@ import Dashboard from "./components/Dashboard.tsx";
 import Login from "./components/Login.tsx";
 import React from "react";
 import ErrorPage from "./components/ErrorPage.tsx";
-import Root from "./components/Root.tsx";
-import PrivateRoute from "./components/PrivateRoute.tsx";
-import Register from "./components/Register.tsx";
+import { PrivateRoute } from "./components/PrivateRoute.tsx";
+import { Root } from "./components/Root.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<Root />}>
-        {/* Public routes */}
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-
-        {/* Protected routes */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Dashboard />} />
-        </Route>
-
-        {/* Invalid routes */}
-        <Route path="*" element={<ErrorPage />} />
-      </Route>
+      <Route path="/" element={<Root />} />
+      {/* Public routes */}
+      <Route path="/login" element={<Login />} />
+      {/* Protected routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      {/* Invalid routes */}
+      <Route path="*" element={<ErrorPage />} />
     </>
   )
 );

@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-import brandLogo from "../assets/brand.svg";
 import { useAppDispatch } from "../app/hooks";
 import { loginUser } from "../features/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
   const INITIAL_FORM_DATA = {
@@ -17,9 +16,12 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const response = await dispatch(loginUser(formData));
-    if (response.meta.requestStatus != "fulfilled") alert("Login failed!");
-    navigate("/");
-    setformData(INITIAL_FORM_DATA);
+    if (response.meta.requestStatus == "fulfilled") {
+      navigate("/");
+      setformData(INITIAL_FORM_DATA);
+    } else {
+      alert("Login failed!");
+    }
   }
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
     setformData((prev) => {
@@ -28,10 +30,10 @@ export default function Login() {
   }
   return (
     <div className="h-[100dvh] bg-black flex flex-col items-center justify-center">
-      <img src={brandLogo} alt="" width={200} height={100} />
+      <img src={'./full-brand.svg'} alt="" width={200} height={100} />
       <form
         onSubmit={handleSubmit}
-        className="h-[50%] bg-[#0C0C0C] flex flex-col justify-evenly px-5 m-5 rounded-xl border-2 border-gray-600"
+        className="h-[50%] w-full bg-[#0C0C0C] flex flex-col justify-evenly px-5 m-5 rounded-xl border-2 border-gray-600"
       >
         <label htmlFor="email" className="text-white font-bold text-xl">
           Email <span className="text-red-600">*</span>
@@ -65,7 +67,7 @@ export default function Login() {
           Login
         </button>
         <p className="text-blue-300 text-sm">
-          New to Life-gui? Sorry, we are not accepting any more users.
+          New to Synergy? <Link to="/register">Login</Link>
         </p>
       </form>
     </div>

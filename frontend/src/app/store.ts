@@ -1,13 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userSlice from '../features/userSlice'
-import financeSlice from '../features/financeSlice'
-import friendSlice from '../features/friendSlice'
 
 export const store = configureStore({
   reducer: {
     user : userSlice,
-    finance : financeSlice,
-    friend  :friendSlice
   },
 })
 

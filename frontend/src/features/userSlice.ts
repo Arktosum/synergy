@@ -46,8 +46,6 @@ export const logoutUser = createAsyncThunk('user/logout', async (_,thunkApi) => 
 })
 
 
-
-
 export function isAuthorized(){
   const item = localStorage.getItem('user-id')
   return item != null;

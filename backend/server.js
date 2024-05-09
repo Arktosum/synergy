@@ -8,13 +8,21 @@ dotenv.config();
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
+const userRouter = require("./routes/userRoutes");
+const roomRouter = require("./routes/roomRoutes");
+const messageRouter = require("./routes/messageRoutes");
 
 app.use(cors());
 app.use(express.json());
+function errorHandler(err, req, res, next) {
+  console.error(err.stack); // Log the error for debugging (optional)
+  res.status(500).send(err.message); // Respond with a generic error message
+}
 
+app.use(errorHandler);
 app.use("/api/users", userRouter);
-app.use("/api/finance", financeRouter);
-app.use("/api/friend", friendRouter);
+app.use("/api/rooms", roomRouter);
+app.use("/api/messages", messageRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI)

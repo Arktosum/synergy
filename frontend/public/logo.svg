@@ -1,19 +1,5 @@
-<svg width="76" height="76" viewBox="0 0 76 76" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g filter="url(#filter0_d_414_23)">
-<rect x="4" width="68" height="68" rx="20" fill="#0094FF"/>
-<path d="M59.7071 47.2929C60.0976 47.6834 60.0976 48.3166 59.7071 48.7071L53.3431 55.0711C52.9526 55.4616 52.3195 55.4616 51.9289 55.0711C51.5384 54.6805 51.5384 54.0474 51.9289 53.6569L57.5858 48L51.9289 42.3431C51.5384 41.9526 51.5384 41.3195 51.9289 40.9289C52.3195 40.5384 52.9526 40.5384 53.3431 40.9289L59.7071 47.2929ZM16 47H59V49H16V47Z" fill="black"/>
-<path d="M15.2929 23.7071C14.9024 23.3166 14.9024 22.6834 15.2929 22.2929L21.6569 15.9289C22.0474 15.5384 22.6805 15.5384 23.0711 15.9289C23.4616 16.3195 23.4616 16.9526 23.0711 17.3431L17.4142 23L23.0711 28.6569C23.4616 29.0474 23.4616 29.6805 23.0711 30.0711C22.6805 30.4616 22.0474 30.4616 21.6569 30.0711L15.2929 23.7071ZM59 24L16 24V22L59 22V24Z" fill="black"/>
-</g>
-<defs>
-<filter id="filter0_d_414_23" x="0" y="0" width="76" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="4"/>
-<feGaussianBlur stdDeviation="2"/>
-<feComposite in2="hardAlpha" operator="out"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_414_23"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_414_23" result="shape"/>
-</filter>
-</defs>
+<svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="68" height="68" rx="20" fill="#0094FF"/>
+<path d="M55.7071 47.2929C56.0976 47.6834 56.0976 48.3166 55.7071 48.7071L49.3431 55.0711C48.9526 55.4616 48.3195 55.4616 47.9289 55.0711C47.5384 54.6805 47.5384 54.0474 47.9289 53.6569L53.5858 48L47.9289 42.3431C47.5384 41.9526 47.5384 41.3195 47.9289 40.9289C48.3195 40.5384 48.9526 40.5384 49.3431 40.9289L55.7071 47.2929ZM12 47H55V49H12V47Z" fill="black"/>
+<path d="M11.2929 23.7071C10.9024 23.3166 10.9024 22.6834 11.2929 22.2929L17.6569 15.9289C18.0474 15.5384 18.6805 15.5384 19.0711 15.9289C19.4616 16.3195 19.4616 16.9526 19.0711 17.3431L13.4142 23L19.0711 28.6569C19.4616 29.0474 19.4616 29.6805 19.0711 30.0711C18.6805 30.4616 18.0474 30.4616 17.6569 30.0711L11.2929 23.7071ZM55 24L12 24V22L55 22V24Z" fill="black"/>
 </svg>
