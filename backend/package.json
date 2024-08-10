@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/server.ts",
-    "dev": "nodemon --watch src --ext ts --ignore src/**/*.spec.ts --exec npm run start"
+    "start": "nodemon src/server.ts",
+    "build": "tsc",
+    "deploy" : "npm run build && vercel --prod"
   },
   "keywords": [],
   "author": "",
