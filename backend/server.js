@@ -9,7 +9,9 @@ const cors = require('cors');
 app.use(cors({
     origin: '*',
 }));
-
+app.get('/',(req,res)=>{
+    res.send("<h1>Hello backend!</h1>")
+})
 const PORT = 3001;
 const server = app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
