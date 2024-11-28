@@ -6,7 +6,10 @@ interface Message {
   content: string;
 }
 
-const socket = io("http://localhost:3001");
+const SOCKET_URL = "https://synergy-g20h.onrender.com"
+// const SOCKET_URL = 'http://localhost:3001'
+
+const socket = io(SOCKET_URL);
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -59,7 +62,6 @@ export default function ChatPage() {
             const new_message = { content: message, sender: username };
             setMessages((prev) => [...prev, new_message]);
             setMessage("");
-            setUsername("");
             socket.emit("sendMessage", new_message);
           }}
           className="text-green-600 px-5 py-2"
