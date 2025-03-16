@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = 'http://localhost:4000';
+const URL = 'https://synergy-0evb.onrender.com:4000';
 const socket = io(URL);
 
 export default socket;

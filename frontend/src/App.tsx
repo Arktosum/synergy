@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
-
-const socket = io("http://localhost:4000");
-
+import socket  from "./socket";
 interface Message {
   user: string;
   text: string;
